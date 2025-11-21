@@ -20,7 +20,7 @@ router.post('/signup', async (req, res) => {
     }
 
     try {
-        const ret = await db.query('INSERT INTO users (username, password) VALUES ($1, $2)', [username, password]);
+        const ret = await db.query('INSERT INTO Account (username, password) VALUES ($1, $2)', [username, password]);
         
         return res.status(200).json({ message: 'Registration successful' });
     }
@@ -34,7 +34,7 @@ router.put('/signin', async (req, res) => {
     const password = req.body.password;
 
     try {
-        const ret = await db.query('SELECT * FROM users WHERE username = $1', [username]);
+        const ret = await db.query('SELECT * FROM Account WHERE username = $1', [username]);
 
         if (ret.rows.length == 0) return res.status(400).json({ error: 'User not found' });
 
