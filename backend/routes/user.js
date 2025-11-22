@@ -7,8 +7,7 @@ const router = express.Router();
 router.use(session({
     secret: 'superduper', 
     resave: false, 
-    saveUninitiazlied: true, 
-    cookie: {}
+    saveUninitialized: true,
 }));
 
 router.post('/signup', async (req, res) => {
