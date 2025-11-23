@@ -40,6 +40,7 @@ router.put('/signin', async (req, res) => {
         if (ret.rows[0].password != password) return res.status(400).json({ error: 'Incorrect password' });
 
         req.session.user = username;
+        req.session.accountId = ret.rows[0].account_id;
         return res.status(200).json({ message: 'Signin successful' });
     }
     catch (err) {
