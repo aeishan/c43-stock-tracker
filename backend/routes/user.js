@@ -4,12 +4,6 @@ const db = require('../db')
 
 const router = express.Router();
 
-router.use(session({
-    secret: 'superduper', 
-    resave: false, 
-    saveUninitialized: true,
-}));
-
 router.post('/signup', async (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
@@ -58,7 +52,7 @@ router.get('/signout', (req, res) => {
 });
 
 router.get('/current', (req, res) => {
-    return res.json({ user: req.session.user });
+    return res.json({ user: req.session.user, accountId: req.session.accountId });
 });
 
 module.exports = router;
