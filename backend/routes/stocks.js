@@ -31,7 +31,7 @@ router.get('/:symbol/all', async (req, res) => {
 });
 
 // current data for given stock (current price)
-router.get('/:symbol', async (req, res) => {
+router.get('/:symbol/current', async (req, res) => {
     const symbol = req.params.symbol;
 
     try {
@@ -48,8 +48,8 @@ router.get('/:symbol', async (req, res) => {
 });
 
 // get data in time range (i.e. /ABC/range?start=date1&end=date2)
-router.get('/:symbol/range', async (req, res) => {
-    const symbol = req.params.symbol;
+router.get('/range', async (req, res) => {
+    const symbol = req.query.symbol;
     const start = req.query.start;
     const end = req.query.end;
 
@@ -121,6 +121,42 @@ router.post('/daily', async (req, res) => {
             `, [symbol, timestamp, open_f, high_f, close_f, low_f, volume_i]);
 
         return res.json({ message: "Stock data added successfully" });
+    } catch (err) {
+        return res.status(500).json({ error: err });
+    }
+});
+
+// make prediction based on past data
+router.get('/predict', async (req, res) => {
+    const symbol = req.query.symbol;
+    const date = req.query.date;
+
+    console.log("here first");
+
+    try {
+        const result = await db.query(`
+            WITH ordered AS (
+            SELECT symbol, close, timestamp,
+                ROW_NUMBER() OVER (ORDER BY timestamp) - 1 AS t
+            FROM dailyRangeStock
+            WHERE symbol = $1
+            ),
+            reg AS (
+            SELECT regr_slope(close, t) AS slope, regr_intercept(close, t) AS intercept
+            FROM ordered
+            ),
+            future_t as (
+            SELECT
+                (SELECT MAX(t) FROM ordered)
+                + (SELECT
+                    EXTRACT(DAYS FROM ($2::timestamp - (SELECT MAX(timestamp) FROM ordered)))
+                ) AS t_future
+            )
+            SELECT intercept + slope * t_future AS price_prediction
+            FROM reg, future_t
+            `, [symbol, date]);
+            
+            return res.status(200).json({ prediction: result.rows[0] });
     } catch (err) {
         return res.status(500).json({ error: err });
     }

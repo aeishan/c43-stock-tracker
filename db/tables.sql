@@ -51,13 +51,13 @@ CREATE TABLE transaction (
 
 CREATE TABLE dailyRangeStock (
     symbol varchar(10) REFERENCES stock(symbol) NOT NULL, 
-    s_timestamp TIMESTAMP NOT NULL, 
+    timestamp TIMESTAMP NOT NULL, 
     open NUMERIC(10,2) NOT NULL,
     high NUMERIC(10,2) NOT NULL,
     close NUMERIC(10,2) NOT NULL,
     low NUMERIC(10,2) NOT NULL,
     volume INT CHECK (volume >= 0),
-    PRIMARY KEY (symbol, s_timestamp)
+    PRIMARY KEY (symbol, timestamp)
 );
 
 CREATE TABLE requestFriendship (

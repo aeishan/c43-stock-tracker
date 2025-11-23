@@ -80,27 +80,26 @@ router.post('/buy', async (req, res) => {
         // if (acc < total) return res.status(400).json({ error: "Insufficient funds" });
 
         await db.query('BEGIN');
+
+        const spRes = await db.query('SELECT current_price FROM stock WHERE symbol = $1', [symbol]);
+        const sp = spRes.rows[0].current_price;
+
         const withdraw = await db.query(`
-            WITH p AS (
-            SELECT current_price
-            FROM stock
-            WHERE symbol = $2
-            ),
-            c AS (
-            SELECT current_price * $3 as total
-            FROM p
-            )
             UPDATE portfolio
-            SET cash_account = cash_account - c.total
-            FROM c
-            WHERE portfolio_id = $1 AND cash_account >= c.total
-            RETURNING cash_account, c.total
-            `, [pid, symbol, shares]);
+            SET cash_account = cash_account - ($2::numeric * $3::numeric)
+            WHERE portfolio_id = $1 AND cash_account >= ($2::numeric * $3::numeric)
+            RETURNING cash_account
+            `, [pid, sp, shares]);
         
         if (withdraw.rowCount == 0) {
             await db.query("ROLLBACK");
             return res.status(400).json({ error: "Insufficient funds" });
         }
+
+        await db.query(`
+            INSERT INTO transaction (type, symbol, shares_moved, strike_price, date_time, portfolio_id)
+            VALUES ('buy', $1, $2, $3, CURRENT_TIMESTAMP, $4)
+            `, [symbol, shares, sp, pid]);
 
         await db.query(`
             INSERT INTO stockholding (shares, symbol, portfolio_id)
@@ -154,7 +153,13 @@ router.post('/sell', async (req, res) => {
             return res.status(400).json({ error: "Stock not found"});
         }
 
-        const total = price.rows[0].current_price * shares;
+        const sp = price.rows[0].current_price;
+        const total = sp * shares;
+
+        await db.query(`
+            INSERT INTO transaction (type, symbol, shares_moved, strike_price, date_time, portfolio_id)
+            VALUES ('sell', $1, $2, $3, CURRENT_TIMESTAMP, $4)
+            `, [symbol, shares, sp, pid]);
 
         await db.query(`
             UPDATE portfolio
