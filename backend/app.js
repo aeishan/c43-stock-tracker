@@ -9,6 +9,7 @@ const stockRouter = require('./routes/stocks');
 const portfolioRouter = require('./routes/portfolio');
 const stockHoldingRouter = require('./routes/stockHolding');
 const friendsRouter = require('./routes/friends');
+const stockListsRouter = require('./routes/stockLists');
 
 const PORT = 3000;
 
@@ -30,6 +31,8 @@ app.use('/stocks', stockRouter);
 app.use('/portfolio', portfolioRouter);
 app.use('/stockHoldings', stockHoldingRouter);
 app.use('/friends', friendsRouter);
+app.use('/stockLists', stockListsRouter);
+
 
 const server = http.createServer(app).listen(PORT, function(err) {
   if (err) console.log(err);
