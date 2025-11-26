@@ -52,7 +52,7 @@ router.get('/public', async (req, res) => {
         `);
 
         if (ret.rows.length === 0) {
-            return res.status(202).json(["dsd"]);
+            return res.status(202).json([]);
         }
 
         const stockListIds = ret.rows.map(row => row.stock_list_id);
