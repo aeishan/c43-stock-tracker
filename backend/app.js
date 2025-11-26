@@ -25,6 +25,8 @@ app.use(session({
 
 app.use(express.json());
 
+app.use(express.static(path.join(__dirname, '../frontend')));
+
 app.use('/user', userRouter);
 app.use('/stocks', stockRouter);
 app.use('/portfolio', portfolioRouter);
