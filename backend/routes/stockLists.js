@@ -227,7 +227,7 @@ router.put('/:stockListId', async (req, res) => {
         );
 
         if (verify.rowCount === 0) {
-            return res.status(403).json({ error: 'Unauthorized to edit this stock list' });
+            return res.status(403).json({ error: 'You cannot edit this stock list' });
         }
 
         // update visibility
@@ -298,7 +298,7 @@ router.post('/:stockListId/share', async (req, res) => {
         );
 
         if (verify.rowCount === 0) {
-            return res.status(403).json({ error: 'Unauthorized to share this stock list' });
+            return res.status(403).json({ error: 'You cannot share this stock list' });
         }
 
         // check if user can already see the stock list
@@ -349,7 +349,7 @@ router.delete('/:stockListId', async (req, res) => {
         );
 
         if (verify.rowCount === 0) {
-            return res.status(403).json({ error: 'Unauthorized to delete this stock list' });
+            return res.status(403).json({ error: 'You cannot delete this stock list' });
         }
 
         // delete entries in stockListContainStockHolding
@@ -361,6 +361,12 @@ router.delete('/:stockListId', async (req, res) => {
         // delete associated entries in accountCanSeeStockList
         await db.query(
             `DELETE FROM accountCanSeeStockList WHERE stock_list_id = $1`,
+            [stockListId]
+        );
+
+        // delete associated reviews
+        await db.query(
+            `DELETE FROM review WHERE stock_list_id = $1`,
             [stockListId]
         );
 
