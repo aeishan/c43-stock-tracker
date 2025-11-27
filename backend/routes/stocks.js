@@ -41,6 +41,8 @@ router.get('/:symbol/current', async (req, res) => {
             WHERE symbol = $1
             `, [symbol]);
         
+        if (data.rowCount == 0) return res.status(404).json({ error: "Not found" });
+        
         return res.status(200).json(data.rows[0]);
     } catch (err) {
         return res.status(500).json({ error: err });
