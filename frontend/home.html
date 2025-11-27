@@ -4,104 +4,71 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stock Tracker - Home</title>
-    <link rel="stylesheet" href="/style/main.css">
-
+    <link rel="stylesheet" href="/css/main.css">
     <style>
-        /* Tabs container */
-        .tabs {
+        .card-container {
             display: flex;
-            border-bottom: 1px solid #444;
-            margin-bottom: 20px;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 40px;
         }
 
-        .tab {
-            padding: 12px 20px;
+        .card {
+            width: 260px;
+            padding: 25px;
+            background: #1f1f1f;
+            border: 1px solid #333;
+            border-radius: 12px;
+            text-align: center;
             cursor: pointer;
-            background-color: #1e1e1e;
-            border: 1px solid #444;
-            border-bottom: none;
-            color: #ddd;
-            border-top-left-radius: 8px;
-            border-top-right-radius: 8px;
-            margin-right: 5px;
+            transition: 0.2s;
         }
 
-        .tab.active {
-            background-color: #2c2c2c;
-            color: #fff;
-            font-weight: bold;
+        .card:hover {
+            background: #2b2b2b;
+            transform: translateY(-4px);
         }
 
-        .tab-content {
-            display: none;
+        .card h3 {
+            color: white;
+            margin-bottom: 10px;
         }
 
-        .tab-content.active {
-            display: block;
+        .card p {
+            color: #ccc;
+            font-size: 0.9rem;
         }
     </style>
 </head>
 <body>
 
-<div class="container" style="width: 800px;">
-    <h2>Welcome to Stock Tracker</h2>
-    <p style="text-align:center; color:#bbb; font-size:0.9rem">
-        Logged in as: <span id="username"></span>
-    </p>
-
-    <!-- TABS -->
-    <div class="tabs">
-        <div class="tab active" data-tab="stocks">Stocks</div>
-        <div class="tab" data-tab="portfolio">Portfolios</div>
-    </div>
-
-    <!-- TAB CONTENT: STOCKS -->
-    <div id="stocks" class="tab-content active">
-        <h3>Stock Search</h3>
-        <p style="color:#ccc;">(Content will be added later once you provide stock.js)</p>
-    </div>
-
-    <!-- TAB CONTENT: PORTFOLIO -->
-    <div id="portfolio" class="tab-content">
-        <h3>Your Portfolios</h3>
-        <p style="color:#ccc;">(Content will be added later once you provide portfolio.js)</p>
-    </div>
-</div>
-
 <script>
-    // --- AUTH CHECK ---
+    // redirect if not logged in
     fetch("/user/current", { credentials: "include" })
         .then(res => res.json())
         .then(data => {
-            if (!data.user) {
-                // Not logged in → redirect to login page
-                window.location.href = "/index.html";
-                return;
-            }
-            // If logged in, show username
-            document.getElementById("username").textContent = data.user;
+            if (!data.user) window.location.href = "/index.html";
+            else document.getElementById("username").textContent = data.user;
         })
-        .catch(() => {
-            // If request fails (server down or no session), redirect
-            window.location.href = "/index.html";
-        });
-
-    // Tab switching logic
-    const tabs = document.querySelectorAll(".tab");
-    const contents = document.querySelectorAll(".tab-content");
-
-    tabs.forEach(tab => {
-        tab.addEventListener("click", () => {
-            const target = tab.getAttribute("data-tab");
-
-            tabs.forEach(t => t.classList.remove("active"));
-            tab.classList.add("active");
-
-            contents.forEach(c => c.classList.remove("active"));
-            document.getElementById(target).classList.add("active");
-        });
-    });
+        .catch(() => window.location.href = "/index.html");
 </script>
+
+<div class="container" style="width: 800px; text-align:center;">
+    <h2>Welcome to Stock Tracker</h2>
+    <p style="color:#bbb;">Logged in as <span id="username"></span></p>
+
+    <div class="card-container">
+        <div class="card" onclick="window.location.href='/stocks.html'">
+            <h3>Stock Search</h3>
+            <p>Look up any stock and view detailed data.</p>
+        </div>
+
+        <div class="card" onclick="window.location.href='/portfolio.html'">
+            <h3>Portfolio Manager</h3>
+            <p>View your portfolios, holdings, and stock predictions.</p>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>
