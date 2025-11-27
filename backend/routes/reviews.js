@@ -36,6 +36,10 @@ router.get('/:stockListId', async (req, res) => {
     const stockListId = parseInt(req.params.stockListId);
     const accountId = req.session.accountId;
 
+    if (!accountId){
+        return res.status(401).json({ error: 'You must be signed in.' });
+    }
+
     if (!stockListId || isNaN(stockListId)) {
         return res.status(400).json({ error: 'Invalid stockListId parameter' });
     }
@@ -79,6 +83,10 @@ router.get('/:stockListId', async (req, res) => {
 router.get('/review/:reviewId', async (req, res) => {
     const reviewId = parseInt(req.params.reviewId);
     const accountId = req.session.accountId;
+
+    if (!accountId){
+        return res.status(401).json({ error: 'You must be signed in.' });
+    }
 
     if (!reviewId || isNaN(reviewId)) {
         return res.status(400).json({ error: 'Invalid reviewId parameter' });
@@ -127,6 +135,10 @@ router.get('/review/:reviewId', async (req, res) => {
 router.post('/', async (req, res) => {
     const { stockListId, review } = req.body;
     const reviewerId = req.session.accountId;
+
+    if (!reviewerId){
+        return res.status(401).json({ error: 'You must be signed in.' });
+    }
 
     if (!stockListId || isNaN(stockListId)) {
         return res.status(400).json({ error: 'Invalid stockListId parameter' });
@@ -178,6 +190,10 @@ router.put('/:reviewId', async (req, res) => {
     const { review } = req.body;
     const reviewerId = req.session.accountId;
 
+    if (!reviewerId){
+        return res.status(401).json({ error: 'You must be signed in.' });
+    }
+
     if (!reviewId || isNaN(reviewId)) {
         return res.status(400).json({ error: 'Invalid reviewId parameter' });
     }
@@ -223,6 +239,10 @@ router.put('/:reviewId', async (req, res) => {
 router.delete('/:reviewId', async (req, res) => {
     const reviewId = parseInt(req.params.reviewId);
     const reviewerId = req.session.accountId;
+
+    if (!reviewerId){
+        return res.status(401).json({ error: 'You must be signed in.' });
+    }
 
     if (!reviewId || isNaN(reviewId)) {
         return res.status(400).json({ error: 'Invalid reviewId parameter' });
