@@ -11,9 +11,12 @@ async function getStocksFromStockLists(idsArray) {
         sl.stock_list_id,
         sl.visibility,
         s.symbol,
+        sh.shares,
+        sh.portfolio_id,
         sl.owner_id
       FROM stocklist sl
       JOIN stockListContainStockHolding s ON sl.stock_list_id = s.stock_list_id
+      JOIN stockHolding sh ON s.symbol = sh.symbol AND s.portfolio_id = sh.portfolio_id
       WHERE sl.stock_list_id = ANY($1)
       `,
       [idsArray]
@@ -35,6 +38,8 @@ async function getStocksFromStockLists(idsArray) {
   
       grouped[id].stocks.push({
         symbol: row.symbol,
+        shares: row.shares,
+        portfolio_id: row.portfolio_id
       });
     }
   
@@ -219,6 +224,10 @@ router.put('/:stockListId', async (req, res) => {
         return res.status(400).json({ error: 'Invalid request body' });
     }
 
+    if (visibility !== 'public' && visibility !== 'private') {
+        return res.status(400).json({ error: 'Invalid visibility value' });
+    }
+
     try {
         // check if stock list belongs to user
         const verify = await db.query(
@@ -386,7 +395,5 @@ router.delete('/:stockListId', async (req, res) => {
         return res.status(500).json({ error: err });
     }
 });
-
-
 
 module.exports = router;
