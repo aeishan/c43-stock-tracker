@@ -5,11 +5,11 @@ CREATE DATABASE stocktracker;
 CREATE TABLE account (
     account_id SERIAL PRIMARY KEY,
     username VARCHAR (20) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL -- long enough to store hashed passwords
+    password VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE stock (
-    current_price INT CHECK (current_price >= 0) NOT NULL,
+    current_price NUMERIC(10,2) CHECK (current_price >= 0) NOT NULL,
     symbol VARCHAR(10) PRIMARY KEY
 );
 
@@ -49,7 +49,7 @@ CREATE TABLE transaction (
     portfolio_id INT REFERENCES portfolio(portfolio_id)  -- ER digram imples this by making one to many relationship between Transaction and StockHolding
 );
 
-CREATE TABLE dailyRangeStock (
+CREATE TABLE dayRangeStock (
     symbol varchar(10) REFERENCES stock(symbol) NOT NULL, 
     timestamp TIMESTAMP NOT NULL, 
     open NUMERIC(10,2) NOT NULL,

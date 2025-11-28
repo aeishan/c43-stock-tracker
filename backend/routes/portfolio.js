@@ -257,7 +257,7 @@ router.get('/matrix', async (req, res) => {
             SELECT d.symbol, d.timestamp,
                 (d.close - LAG(d.close) OVER (PARTITION BY d.symbol ORDER BY d.timestamp)) 
                 / LAG(d.close) OVER (PARTITION BY d.symbol ORDER BY d.timestamp) as ret
-            FROM dailyRangeStock d
+            FROM dayRangeStock d
             JOIN syms s USING (symbol)
             ),
             clean AS (
