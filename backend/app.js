@@ -11,6 +11,7 @@ const stockHoldingRouter = require('./routes/stockHolding');
 const friendsRouter = require('./routes/friends');
 const stockListsRouter = require('./routes/stockLists');
 const reviewsRouter = require('./routes/reviews');
+const statsRouter = require('./routes/stats');
 
 const PORT = 3000;
 
@@ -36,6 +37,7 @@ app.use('/stockHoldings', stockHoldingRouter);
 app.use('/friends', friendsRouter);
 app.use('/stockLists', stockListsRouter);
 app.use('/reviews', reviewsRouter);
+app.use('/stats', statsRouter);
 
 
 const server = http.createServer(app).listen(PORT, function(err) {
