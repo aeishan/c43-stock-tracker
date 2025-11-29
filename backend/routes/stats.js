@@ -8,7 +8,7 @@ router.get('/matrix', async (req, res) => {
     const usage = req.query.usage;
     
     const query = usage == 'stockholding' ? 'SELECT symbol FROM stockholding WHERE portfolio_id = $1' :
-        'SELECT symbol FROM stocklistcontainstockholding WHERE stocklist_id = $1';
+        'SELECT symbol FROM stocklistcontainstockholding WHERE stock_list_id = $1';
 
     try {
         const s = await db.query(query, [id]);

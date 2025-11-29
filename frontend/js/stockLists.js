@@ -47,6 +47,16 @@ function createStockListCard(list) {
         stockList.appendChild(li);
     });
 
+    const btnCont = document.createElement("div");
+    btnCont.classList.add("card-btn-cont");
+
+    const viewBtn = document.createElement("button");
+    viewBtn.textContent = "View";
+    viewBtn.style.marginTop = "10px";
+    viewBtn.onclick = () => {
+        window.location.href = `/stocklist.html?id=${list.stocklistID}`;
+    }
+
     const deleteBtn = document.createElement("button");
     deleteBtn.textContent = "Delete";
     deleteBtn.style.marginTop = "10px";
@@ -78,6 +88,7 @@ function createStockListCard(list) {
 
     const editBtn = document.createElement("button");
     editBtn.textContent = "Edit";
+    editBtn.style.marginTop = "10px";
     editBtn.onclick = async () => {
         const newVisibility = prompt(
             "Enter new visibility (e.g. public/private):",
@@ -125,8 +136,10 @@ function createStockListCard(list) {
     div.appendChild(owner);
     div.appendChild(visibility);
     div.appendChild(stockList);
-    div.appendChild(deleteBtn);
-    div.appendChild(editBtn);
+    btnCont.appendChild(viewBtn);
+    btnCont.appendChild(deleteBtn);
+    btnCont.appendChild(editBtn);
+    div.appendChild(btnCont);
 
     return div;
 }
