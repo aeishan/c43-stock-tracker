@@ -133,10 +133,8 @@ function createStockListCard(list) {
 
 (async () => {
     try {
-        console.log("FETCHING STOCK LISTS");
         const allResults = await Promise.all(endpoints.map((e) => fetchJson(e)));
         const flat = allResults.flat();
-        console.log("GOT HERE", flat);
         const unique = mergeAndDedup(flat);
 
         stockListsContainer.innerHTML = "";
@@ -154,3 +152,35 @@ function createStockListCard(list) {
         alert(`Error fetching stock lists: ${err.message}`);
     }
 })();
+
+document.getElementById("shareForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const viewerId = document.getElementById("viewerId").value.trim();
+    const stockListId = document.getElementById("stockListId").value.trim();
+
+    if (!viewerId || !stockListId) {
+        alert("Please enter both Friend ID and Stock List ID.");
+        return;
+    }
+
+    try {
+        const res = await fetch(`/stockLists/${stockListId}/share`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ viewerId: parseInt(viewerId) }),
+        });
+
+        const result = await res.json();
+
+        if (!res.ok) {
+            alert(result.error || "Failed to share stock list.");
+            return;
+        }
+
+        alert("Stock list shared successfully!");
+    } catch (err) {
+        alert("Error sharing stock list: " + err.message);
+    }
+});
