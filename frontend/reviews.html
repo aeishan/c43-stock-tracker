@@ -1,29 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <title>Reviews</title>
-  <link rel="stylesheet" href="./css/main.css" />
-  <style>
-    .review-card {
-      border: 1px solid #ccc;
-      padding: 1rem;
-      margin-bottom: 1rem;
-      border-radius: 8px;
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <title>Reviews</title>
+    <link rel="stylesheet" href="./css/main.css" />
+    <style>
+        .review-card {
+            border: 1px solid #ccc;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+        }
+    </style>
 </head>
+
 <body>
-  <div class="container">
-    <h1>View Reviews for a Stock List</h1>
+    <div class="container">
+        <h1>View Reviews for a Stock List</h1>
 
-    <label for="stockListIdInput">Enter Stock List ID:</label>
-    <input type="number" id="stockListIdInput" placeholder="e.g. 1" />
-    <button onclick="fetchReviews()">Get Reviews</button>
+        <label for="stockListIdInput">Enter Stock List ID:</label>
+        <input type="number" id="stockListIdInput" placeholder="e.g. 1" />
+        <button onclick="fetchReviews()">Get Reviews</button>
 
-    <div id="reviewsContainer"></div>
-  </div>
+        <div id="reviewsContainer"></div>
+    </div>
 
-  <script src="./js/reviews.js"></script>
+    <script src="./js/reviews.js"></script>
 </body>
+
 </html>

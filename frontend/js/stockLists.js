@@ -26,7 +26,7 @@ function mergeAndDedup(lists) {
     return merged;
 }
 
-// Display one stock list entry
+
 function createStockListCard(list) {
     const div = document.createElement("div");
     div.className = "stock-list-card";
@@ -87,7 +87,7 @@ function createStockListCard(list) {
 
         const newStocksRaw = prompt(
             "Enter stocks as comma-separated entries like SYMBOL:PORTFOLIO_ID\nExample: AAPL:1,GOOG:2",
-            list.stocks.map((s) => `${s.symbol}:${s.portfolio_id}`).join(",")
+            list.stocks.map((s) => `${s.symbol}:${s.portfolio_id}`).join(",")  // pre-fill current stocks in prompt
         );
         if (!newStocksRaw) return;
 
