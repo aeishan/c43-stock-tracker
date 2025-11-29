@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Stock List</title>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <link rel="stylesheet" href="/css/main.css" />
+
+  <!-- Minimal page-specific CSS matching portfolio.html layout -->
+  <style>
+    /* Defensive reset similar to portfolio.html */
+    body {
+      display: block !important;
+      height: auto !important;
+      margin: 0 !important;
+      background: #0f1620 !important;
+      justify-content: normal !important;
+      align-items: normal !important;
+      font-family: system-ui, Arial;
+      color: #eee;
+    }
+    .container { width: auto !important; max-width: 1300px !important; padding: 24px !important; background: none !important; box-shadow: none !important; }
+    h1 { margin:0 0 6px 0; }
+    p.lead { margin:0; color:#bbb; font-size:0.95rem; }
+
+    .topbar { display:flex; align-items:center; justify-content:space-between; gap:12px; margin: 18px 0; padding-bottom: 8px; border-bottom:1px solid #222; }
+    .main-stack { display:flex; flex-direction:column; gap:12px; margin-top:12px; }
+
+    /* Matrix area */
+    #matrixContainer { background:#0b1116; padding:10px; border-radius:8px; border:1px solid #222; color:#ddd; }
+    table.matrix { border-collapse: collapse; width:100%; table-layout: fixed; }
+    table.matrix th, table.matrix td { border:1px solid #222; padding:8px; text-align:center; font-size:0.95rem; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+    table.matrix th { background: rgba(255,255,255,0.03); font-weight:700; }
+
+    /* bottom grid like portfolio */
+    .main-grid { display:grid; grid-template-columns: 360px 1fr; gap:16px; align-items:start; margin-top:6px; }
+    .col { background:#111; padding:16px; border-radius:8px; border:1px solid #222; }
+
+    #holdingsList .holding { padding:12px; border-radius:6px; margin-bottom:10px; background:transparent; border:1px solid rgba(255,255,255,0.02); transition:all .12s; cursor:pointer; }
+    #holdingsList .holding:hover { background: rgba(255,255,255,0.02); transform: translateY(-2px); }
+
+    #rightPanel { display:flex; flex-direction:column; gap:12px; }
+    #holdingDetailBox { background:#0f1418; padding:12px; border-radius:8px; border:1px solid #222; }
+
+    /* chart container toggling */
+    #chartContainer { visibility:hidden; width:0; height:0; overflow:hidden; transition: width .18s, height .18s; }
+    #chartContainer.visible { visibility:visible; width:100%; height:360px; }
+
+    .small { font-size:0.9rem; color:#bbb; }
+    .btn { background:#2d8cf0; border:none; padding:8px 12px; border-radius:6px; color:#fff; cursor:pointer; }
+    .ghost { background:transparent; border:1px solid #2a2a2a; color:#ddd; padding:8px 10px; border-radius:6px; }
+    @media (max-width:900px) { .main-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Stock List</h1>
+    <p class="lead">View holdings, historical performance and predictions for a stock list.</p>
+
+    <div class="topbar">
+      <div id="stocklistHeader">
+        <!-- Filled by JS: e.g. "StockList 1 — Owner 1 (private)" -->
+      </div>
+
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button id="backToLists" class="ghost">Back to lists</button>
+      </div>
+    </div>
+
+    <div class="main-stack">
+      <!-- Matrix (full-width) -->
+      <div id="matrixContainer" style="display:none;">
+        <div style="font-weight:700; margin-bottom:8px;">Correlation / Covariance Matrix</div>
+        <div id="matrixPlaceholder" style="color:#9aa3b2;">Select a stock to compute a matrix.</div>
+        <div id="matrixTable" style="display:none; margin-top:8px;">
+          <div id="correlationTable"></div>
+          <div id="covarianceTable" style="margin-top:16px;"></div>
+        </div>
+      </div>
+
+      <!-- Bottom two-column layout -->
+      <div class="main-grid">
+        <!-- LEFT: holdings list -->
+        <div class="col">
+          <div>
+            <div style="font-weight:700; margin-bottom:8px;">Holdings</div>
+            <div id="holdingsList" style="max-height:520px; overflow:auto; padding:4px;"></div>
+          </div>
+        </div>
+
+        <!-- RIGHT: stock detail / chart / prediction -->
+        <div id="rightPanel" class="col">
+          <div id="portfolioSummaryMini" style="padding:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <div style="font-weight:700;" id="stocklistTitle">StockList</div>
+                <div style="color:#bbb;" id="stocklistMeta"></div>
+              </div>
+              <div style="text-align:right; color:#bbb;">
+                <div id="stocklistVisibility"></div>
+              </div>
+            </div>
+          </div>
+
+          <div id="holdingDetailBox" style="display:none;">
+            <div id="holdingDetail" style="padding:12px;">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                  <div style="font-weight:700; font-size:1.05rem;" id="holdingSymbol">SYMBOL</div>
+                  <div style="color:#bbb;" id="holdingShares"></div>
+                </div>
+                <div style="text-align:right;">
+                  <div style="color:#bbb;">Current Price</div>
+                  <div id="holdingPrice" style="font-weight:700;">$0.00</div>
+                </div>
+              </div>
+
+              <div style="margin-top:12px;" class="controls">
+                <label class="small">Range Start <input id="holdingRangeStart" type="date" /></label>
+                <label class="small">Range End <input id="holdingRangeEnd" type="date" /></label>
+                <button id="holdingLoadRange" class="btn">Load Chart</button>
+              </div>
+
+              <div id="chartContainer">
+                <canvas id="holdingChart"></canvas>
+              </div>
+
+              <div style="margin-top:12px;">
+                <div style="font-weight:700; margin-bottom:6px;">Predicted Price</div>
+                <div style="display:flex; gap:8px; align-items:center;">
+                  <input id="predictDate" type="date" />
+                  <button id="predictBtn" class="btn">Predict</button>
+                  <div id="predictResult" style="color:#bbb; margin-left:8px;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/js/stocklist.js"></script>
+</body>
+</html>

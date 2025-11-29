@@ -4,13 +4,6 @@ const db = require('../db')
 
 const router = express.Router();
 
-router.use(session({
-    secret: 'superduper', 
-    resave: false, 
-    saveUninitiazlied: true, 
-    cookie: {}
-}));
-
 router.post('/signup', async (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
@@ -20,7 +13,7 @@ router.post('/signup', async (req, res) => {
     }
 
     try {
-        const ret = await db.query('INSERT INTO users (username, password) VALUES ($1, $2)', [username, password]);
+        const ret = await db.query('INSERT INTO Account (username, password) VALUES ($1, $2)', [username, password]);
         
         return res.status(200).json({ message: 'Registration successful' });
     }
@@ -34,13 +27,14 @@ router.put('/signin', async (req, res) => {
     const password = req.body.password;
 
     try {
-        const ret = await db.query('SELECT * FROM users WHERE username = $1', [username]);
+        const ret = await db.query('SELECT * FROM Account WHERE username = $1', [username]);
 
         if (ret.rows.length == 0) return res.status(400).json({ error: 'User not found' });
 
         if (ret.rows[0].password != password) return res.status(400).json({ error: 'Incorrect password' });
 
         req.session.user = username;
+        req.session.accountId = ret.rows[0].account_id;
         return res.status(200).json({ message: 'Signin successful' });
     }
     catch (err) {
@@ -58,7 +52,7 @@ router.get('/signout', (req, res) => {
 });
 
 router.get('/current', (req, res) => {
-    return res.json({ user: req.session.user });
+    return res.json({ user: req.session.user, accountId: req.session.accountId });
 });
 
 module.exports = router;
