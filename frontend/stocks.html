@@ -1,123 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Stocks</title>
   <link rel="stylesheet" href="/css/main.css" />
-
   <style>
+    :root { --chart-h: 360px; }
+
+    /* ----- PAGE FRAME ----- */
+    html,body { height:100%; margin:0; }
     body {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    padding: 20px;
+      font-family: system-ui, Arial, sans-serif;
+      background:#0f1620;
+      color:#eee;
+      box-sizing:border-box;
+      -webkit-font-smoothing:antialiased;
+    }
+    .page {
+      padding: 12px 20px 40px 20px;
+      max-width: 1100px;
+      margin: 0 auto;
     }
 
-    #stockList .stock-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 8px;
-      border-bottom: 1px solid #333;
-      cursor: pointer;
+    /* ----- STICKY HEADER (keeps title/search visible) ----- */
+    header#topHeader {
+      position: sticky;
+      top: 0;
+      z-index: 250;
+      background: linear-gradient(#0f1620, rgba(15,22,32,0.95));
+      padding: 12px 0 8px 0;
+      backdrop-filter: blur(2px);
+      border-bottom: 1px solid rgba(255,255,255,0.03);
     }
+    header .top-row { display:flex; gap:12px; align-items:center; justify-content:space-between; }
+    header h1 { margin:0; font-size:1.25rem; }
+    header .controls { display:flex; gap:8px; align-items:center; }
+    header #searchInput { margin-bottom: 0px; }
 
-    #addStockPanel {
-      padding: 12px;
-      border: 1px solid #444;
-      margin-top: 8px;
-      background: #222;
-      border-radius: 6px;
-    }
-
-    #addStockPanel label {
-      display: block;
-      margin-top: 6px;
-    }
-
-    #addStockPanel input {
-      width: 100%;
-      margin-top: 4px;
-      padding: 6px;
-    }
-
-    .chart-container {
-      width: 60%;
-      height: 350px;
-      margin-top: 20px;
-    }
-
-    .chart-container.hidden {
-      visibility: hidden;
-      width: 0;
-      height: 0;
+    /* ----- CHART AREA (accordion friendly) ----- */
+    #chartContainer {
       overflow: hidden;
+      max-height: 0;
+      opacity: 0;
+      transition: max-height 320ms cubic-bezier(.2,.8,.2,1), opacity 220ms ease;
+      border-radius:8px;
+      border:1px solid rgba(255,255,255,0.03);
+      background:#071017;
+      margin-top:12px;
     }
+    #chartContainer.visible {
+      max-height: calc(var(--chart-h) + 28px); /* internal padding + canvas height */
+      opacity: 1;
+    }
+    .chart-inner {
+      padding:12px;
+      box-sizing:border-box;
+      height: var(--chart-h);
+    }
+    .chart-inner canvas {
+      width:100% !important;
+      height:100% !important;
+      display:block;
+    }
+
+    /* ----- STOCK LIST (scrollable box) ----- */
+    section#listSection { margin-top:12px; }
+    #stockListContainer {
+      max-height: 520px;
+      overflow-y: auto;
+      border:1px solid rgba(255,255,255,0.03);
+      background:#0b0f12;
+      padding:6px;
+      border-radius:6px;
+      box-sizing:border-box;
+    }
+    .stock-item {
+      display:flex; justify-content:space-between; padding:8px;
+      border-bottom:1px solid rgba(255,255,255,0.02); cursor:pointer;
+    }
+    .stock-item:hover { background: rgba(255,255,255,0.02); transform:translateY(-1px); }
+
+    /* misc */
+    #addStockPanel { margin-top:12px; padding:12px; background:#101419; border-radius:6px; border:1px solid rgba(255,255,255,0.02); }
+    input,button { font-size:0.95rem; }
+    @media (max-width:720px){ .page{padding:8px} }
   </style>
 </head>
-
 <body>
-  <h1>Stocks</h1>
+  <div class="page">
+    <header id="topHeader">
+      <div class="top-row">
+        <div style="display:flex;flex-direction:column">
+          <h1>Stocks</h1>
+          <div style="color:#bfc9d3; font-size:0.9rem; margin-top:6px;">Search and view historical data</div>
+        </div>
 
-  <!-- SEARCH BAR -->
-  <section>
-    <input id="searchInput" type="text" placeholder="Enter symbol (AAPL)" />
-    <button id="searchBtn">Search</button>
-  </section>
+        <div class="controls" style="min-width:320px; justify-self:end;">
+          <input id="searchInput" type="text" placeholder="Enter symbol (AAPL)" style="padding:8px;border-radius:6px;border:1px solid #263042;background:#081018;color:#fff;"/>
+          <button id="searchBtn" style="padding:8px 10px; border-radius:6px;" >Search</button>
+        </div>
+      </div>
+    </header>
 
-  <!-- SEARCH RESULT -->
-  <div id="searchResult" style="margin-top: 20px;"></div>
+    <!-- result + chart below header -->
+    <div id="resultAndChart" style="margin-top:500px;">
+      <!-- SEARCH RESULT -->
+      <div id="searchResult" style="margin-top: 4px;"></div>
 
-  <!-- CHART AREA -->
-  <div id="chartContainer" class="chart-container">
-    <canvas id="rangeChart"></canvas>
-  </div>  
+      <!-- CHART AREA (accordion friendly, no display:none) -->
+      <div id="chartContainer" aria-hidden="true">
+        <div class="chart-inner">
+          <canvas id="rangeChart"></canvas>
+        </div>
+      </div>
+    </div>
 
-  <hr />
+    <section id="listSection">
+      <h2 style="margin:10px 0 8px 0;">All Stocks</h2>
+      <div id="stockListContainer">
+        <div id="stockList"></div>
+      </div>
+    </section>
 
-  <!-- STOCK LIST -->
-  <section>
-    <h2>All Stocks</h2>
-    <div id="stockList"></div>
-  </section>
-
-  <hr />
-
-  <!-- ADD STOCK PANEL (TOGGLED) -->
-  <button id="toggleAddStock">Add Stock Data ▼</button>
-
-  <div id="addStockPanel">
-    <h3>Add Daily Stock Data</h3>
-
-    <label>Symbol</label>
-    <input type="text" id="addSymbol" placeholder="AAPL" />
-
-    <label>Date</label>
-    <input type="date" id="addTimestamp" />
-
-    <label>Open</label>
-    <input type="number" id="addOpen" step="0.01" />
-
-    <label>High</label>
-    <input type="number" id="addHigh" step="0.01" />
-
-    <label>Low</label>
-    <input type="number" id="addLow" step="0.01" />
-
-    <label>Close (required)</label>
-    <input type="number" id="addClose" step="0.01" />
-
-    <label>Volume</label>
-    <input type="number" id="addVolume" />
-
-    <button id="submitAddStock" style="margin-top:12px;">Submit</button>
-
-    <p id="addStockMsg" style="margin-top:8px;"></p>
+    <div style="margin-top:14px;">
+      <button id="toggleAddStock">Add Stock Data ▼</button>
+      <div id="addStockPanel" style="display:none;">
+        <h3>Add Daily Stock Data</h3>
+        <label>Symbol</label><input type="text" id="addSymbol" />
+        <label>Date</label><input type="date" id="addTimestamp" />
+        <label>Open</label><input type="number" id="addOpen" step="0.01" />
+        <label>High</label><input type="number" id="addHigh" step="0.01" />
+        <label>Low</label><input type="number" id="addLow" step="0.01" />
+        <label>Close (required)</label><input type="number" id="addClose" step="0.01" />
+        <label>Volume</label><input type="number" id="addVolume" />
+        <div style="margin-top:8px;"><button id="submitAddStock">Submit</button></div>
+        <p id="addStockMsg"></p>
+      </div>
+    </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="/js/stocks.js"></script>
+  <script type="module" src="/js/stocks.js"></script>
 </body>
-
 </html>
