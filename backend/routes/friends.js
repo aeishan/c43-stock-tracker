@@ -116,7 +116,7 @@ router.get('/requests/incoming', async (req, res) => {
     }
     try {
         const data = await db.query(`
-            SELECT r.sender_id AS friend_id, a.username AS friend_username, r.status
+            SELECT r.sender_id AS friend_id, a.username AS friend_username, r.status, r.time_modified
             FROM RequestFriendship r
             JOIN Account a ON r.sender_id = a.account_id
             WHERE r.receiver_id = $1 AND r.status = 'pending'
@@ -135,7 +135,7 @@ router.get('/requests/outgoing', async (req, res) => {
     }
     try {
         const data = await db.query(`
-            SELECT r.receiver_id AS friend_id, a.username AS friend_username, r.status
+            SELECT r.receiver_id AS friend_id, a.username AS friend_username, r.status, r.time_modified
             FROM RequestFriendship r
             JOIN Account a ON r.receiver_id = a.account_id
             WHERE r.sender_id = $1 AND r.status = 'pending'

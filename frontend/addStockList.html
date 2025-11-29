@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Add Stock List</title>
+    <link rel="stylesheet" href="./css/main.css" />
+    <style>
+        input,
+        select {
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Create a New Stock List</h1>
+
+        <label for="visibility">Visibility:</label>
+        <select id="visibility">
+            <option value="private">Private</option>
+            <option value="public">Public</option>
+        </select>
+
+        <div id="stocksContainer">
+            <h3>Stocks</h3>
+            <div class="stock-input">
+                <input type="text" placeholder="Symbol (e.g. AAPL)" class="symbol" />
+                <input type="text" placeholder="Portfolio ID (e.g. 101)" class="portfolio_id" />
+            </div>
+        </div>
+
+        <button id="addStockBtn">+ Add Another Stock</button>
+        <button id="submitBtn">Create Stock List</button>
+        <p id="resultMsg"></p>
+    </div>
+
+    <script src="./js/addStockList.js"></script>
+</body>
+
+</html>

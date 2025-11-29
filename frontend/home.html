@@ -42,33 +42,66 @@
 </head>
 <body>
 
-<script>
-    // redirect if not logged in
-    fetch("/user/current", { credentials: "include" })
-        .then(res => res.json())
-        .then(data => {
-            if (!data.user) window.location.href = "/index.html";
-            else document.getElementById("username").textContent = data.user;
-        })
-        .catch(() => window.location.href = "/index.html");
-</script>
+    <script>
+        // redirect if not logged in
+        fetch("/user/current", { credentials: "include" })
+            .then(res => res.json())
+            .then(data => {
+                if (!data.user) window.location.href = "/index.html";
+                else document.getElementById("username").textContent = data.user;
+            })
+            .catch(() => window.location.href = "/index.html");
 
-<div class="container" style="width: 800px; text-align:center;">
-    <h2>Welcome to Stock Tracker</h2>
-    <p style="color:#bbb;">Logged in as <span id="username"></span></p>
+        async function logout() {
+            try {
+                const res = await fetch("/user/signout", {
+                    method: "GET",
+                    credentials: "include"
+                });
 
-    <div class="card-container">
-        <div class="card" onclick="window.location.href='/stocks.html'">
-            <h3>Stock Search</h3>
-            <p>Look up any stock and view detailed data.</p>
-        </div>
+                const result = await res.json();
 
-        <div class="card" onclick="window.location.href='/portfolio.html'">
-            <h3>Portfolio Manager</h3>
-            <p>View your portfolios, holdings, and stock predictions.</p>
+                if (!res.ok) {
+                    alert(result.error || "Logout failed.");
+                    return;
+                }
+
+                window.location.href = "/index.html";
+            } catch (err) {
+                alert("Error logging out: " + err.message);
+            }
+        }
+    </script>
+
+    <div class="container" style="width: 800px; text-align:center;">
+        <h2>Welcome to Stock Tracker</h2>
+        <p style="color:#bbb;">Logged in as <span id="username"></span></p>
+
+        <button class="logout-btn" onclick="logout()">Logout</button>
+
+        <div class="card-container">
+            <div class="card" onclick="window.location.href='/stocks.html'">
+                <h3>Stock Search</h3>
+                <p>Look up any stock and view detailed data.</p>
+            </div>
+
+            <div class="card" onclick="window.location.href='/portfolio.html'">
+                <h3>Portfolio Manager</h3>
+                <p>View your portfolios, holdings, and stock predictions.</p>
+            </div>
+
+            <div class="card" onclick="window.location.href='/stockLists.html'">
+                <h3>Stock Lists</h3>
+                <p>View stock lists owned by you, your friends, or any public ones.</p>
+            </div>
+            <div class="card" onclick="window.location.href='/friends.html'">
+                <h3>Friends</h3>
+                <p>View your friends, interact with incoming friend request, and share private stock lists to friends.
+                </p>
+            </div>
         </div>
     </div>
-</div>
 
 </body>
+
 </html>
