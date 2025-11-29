@@ -19,7 +19,7 @@ router.get('/:symbol/all', async (req, res) => {
     try {
         const data = await db.query(`
             SELECT * 
-            FROM DailyRangeStock
+            FROM dayRangeStock
             WHERE symbol = $1
             ORDER BY timestamp ASC
             `, [symbol]);
@@ -58,7 +58,7 @@ router.get('/range', async (req, res) => {
     try {
         const daily = await db.query(`
             SELECT * 
-            FROM dailyRangeStock
+            FROM dayRangeStock
             WHERE symbol = $1 AND timestamp BETWEEN $2 AND $3
             ORDER BY timestamp ASC
             `, [symbol, start, end]);
@@ -66,14 +66,14 @@ router.get('/range', async (req, res) => {
         const stats = await db.query(`
             WITH stock_r AS (
             SELECT timestamp, (close - LAG(close) OVER (ORDER BY timestamp)) / LAG(close) OVER (ORDER BY timestamp) AS r
-            FROM dailyRangeStock
+            FROM dayRangeStock
             WHERE symbol = $1 AND timestamp BETWEEN $2 AND $3
             ),
             all_r AS (
             SELECT timestamp, symbol, 
                 (close - LAG(close) OVER (PARTITION BY symbol ORDER BY timestamp))
                 / LAG(close) OVER (PARTITION BY symbol ORDER BY timestamp) AS r
-            FROM dailyRangeStock
+            FROM dayRangeStock
             WHERE timestamp BETWEEN $2 AND $3
             ),
             market_avg AS (
@@ -118,7 +118,7 @@ router.post('/daily', async (req, res) => {
             `, [close_f, symbol]);
 
         await db.query(`
-            INSERT INTO dailyRangeStock (symbol, timestamp, open, high, close, low, volume) 
+            INSERT INTO dayRangeStock (symbol, timestamp, open, high, close, low, volume) 
             VALUES ($1, $2, $3, $4, $5, $6 ,$7)
             `, [symbol, timestamp, open_f, high_f, close_f, low_f, volume_i]);
 
@@ -140,7 +140,7 @@ router.get('/predict', async (req, res) => {
             WITH ordered AS (
             SELECT symbol, close, timestamp,
                 ROW_NUMBER() OVER (ORDER BY timestamp) - 1 AS t
-            FROM dailyRangeStock
+            FROM dayRangeStock
             WHERE symbol = $1
             ),
             reg AS (
