@@ -291,7 +291,7 @@ if (holdingLoadRangeBtn) {
             data: prices,
             borderWidth: 2,
             tension: 0.12,
-            pointRadius: 3
+            pointRadius: 0
           }]
         },
         options: { responsive: true, maintainAspectRatio: false }

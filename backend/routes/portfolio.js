@@ -35,6 +35,7 @@ router.get('/', async (req, res) => {
         const ret = await db.query(`
             SELECT * FROM portfolio
             WHERE owner_id = $1
+            ORDER BY portfolio_id ASC
             `, [id]);
         
         return res.status(200).json(ret.rows);

@@ -52,10 +52,10 @@ CREATE TABLE transaction (
 CREATE TABLE dayRangeStock (
     symbol varchar(10) REFERENCES stock(symbol) NOT NULL, 
     timestamp TIMESTAMP NOT NULL, 
-    open NUMERIC(10,2) NOT NULL,
-    high NUMERIC(10,2) NOT NULL,
-    close NUMERIC(10,2) NOT NULL,
-    low NUMERIC(10,2) NOT NULL,
+    open NUMERIC(10,2),
+    high NUMERIC(10,2),
+    close NUMERIC(10,2),
+    low NUMERIC(10,2),
     volume INT CHECK (volume >= 0),
     PRIMARY KEY (symbol, timestamp)
 );

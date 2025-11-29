@@ -14,7 +14,7 @@ CREATE TEMP TABLE temp_csv (
 
 -- Load data from CSV into temporary table
 COPY temp_csv(symbol, timestamp, open, high, low, close, volume)
-FROM '/Users/eishan/downloads/updatedFile.csv'  -- update file path as needed
+FROM 'C:/Program Files/PostgreSQL/17/pgAdmin 4/SP500History.csv'  -- update file path as needed
 DELIMITER ',' CSV HEADER;
 
 -- Insert unique symbols into stock table
