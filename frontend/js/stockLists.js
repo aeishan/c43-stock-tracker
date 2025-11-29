@@ -151,5 +151,6 @@ function createStockListCard(list) {
         });
     } catch (err) {
         stockListsContainer.textContent = `Error: ${err.message}`;
+        alert(`Error fetching stock lists: ${err.message}`);
     }
 })();

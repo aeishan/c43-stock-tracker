@@ -210,7 +210,7 @@ router.post('/', async (req, res) => {
 
     } catch (err) {
         console.error('Error creating stock list:', err);
-        return res.status(500).json({ error: 'Internal server error' });
+        return res.status(500).json({ error: err });
     }
 });
 

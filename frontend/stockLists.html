@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>All Stock Lists</title>
+    <title>Stock Lists</title>
     <link rel="stylesheet" href="./css/main.css" />
     <style>
       .stock-list-card {
@@ -16,12 +16,28 @@
   <body>
     <div>
       <button
-        onclick="window.location.href='addStockList.html'"
+        onclick="window.location.href='/addStockList.html'"
         style="margin-bottom: 1rem"
       >
         Add New Stock List
       </button>
     </div>
+    <div>
+        <button
+          onclick="window.location.href='/leaveReview.html'"
+          style="margin-bottom: 1rem"
+        >
+          Leave Review on a Stock List
+        </button>
+      </div>
+      <div>
+        <button
+          onclick="window.location.href='/reviews.html'"
+          style="margin-bottom: 1rem"
+        >
+          Check Reviews for a Stock List
+        </button>
+      </div>
     <div class="container">
       <h1>All Stock Lists You Can View</h1>
       <div id="stockListsContainer">Loading...</div>

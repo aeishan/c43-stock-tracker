@@ -42,8 +42,7 @@ document.getElementById("submitBtn").addEventListener("click", async () => {
         const result = await res.json();
 
         if (!res.ok) {
-            document.getElementById("resultMsg").textContent = result.error || "Failed to create stock list.";
-            return;
+            throw new Error(result.err || "Failed to create stock list.");
         }
 
         document.getElementById("resultMsg").textContent = "Stock list created successfully!";
@@ -53,6 +52,6 @@ document.getElementById("submitBtn").addEventListener("click", async () => {
             window.location.href = "/stockLists.html";
         }, 1500);
     } catch (err) {
-        document.getElementById("resultMsg").textContent = "Error: " + err.message;
+        alert("Error creating stock list: " + err.message);
     }
 });
