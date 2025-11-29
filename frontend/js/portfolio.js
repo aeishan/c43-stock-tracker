@@ -388,48 +388,107 @@ async function loadMatrix(pid) {
   }
 }
 
+// function renderMatrix(obj) {
+//   if (!obj || !Array.isArray(obj.symbols) || !obj.correlation) {
+//     matrixPlaceholder.textContent = "No matrix available";
+//     matrixTableContainer.style.display = "none";
+//     return;
+//   }
+//   const symbols = obj.symbols;
+//   const corr = obj.correlation;
+
+//   const tbl = document.createElement("table");
+//   tbl.className = "matrix";
+//   const thead = document.createElement("thead");
+//   const headRow = document.createElement("tr");
+//   headRow.appendChild(document.createElement("th"));
+//   symbols.forEach(s => {
+//     const th = document.createElement("th");
+//     th.textContent = s;
+//     headRow.appendChild(th);
+//   });
+//   thead.appendChild(headRow);
+//   tbl.appendChild(thead);
+
+//   const tbody = document.createElement("tbody");
+//   for (let i = 0; i < symbols.length; ++i) {
+//     const tr = document.createElement("tr");
+//     const th = document.createElement("th");
+//     th.textContent = symbols[i];
+//     tr.appendChild(th);
+//     for (let j = 0; j < symbols.length; ++j) {
+//       const td = document.createElement("td");
+//       const v = corr[i] && corr[i][j];
+//       td.textContent = (v === null || v === undefined) ? "-" : Number(v).toFixed(3);
+//       tr.appendChild(td);
+//     }
+//     tbody.appendChild(tr);
+//   }
+//   tbl.appendChild(tbody);
+//   matrixTableContainer.innerHTML = "";
+//   matrixTableContainer.appendChild(tbl);
+//   matrixPlaceholder.style.display = "none";
+//   matrixTableContainer.style.display = "block";
+// }
+
 function renderMatrix(obj) {
-  if (!obj || !Array.isArray(obj.symbols) || !obj.correlation) {
-    matrixPlaceholder.textContent = "No matrix available";
-    matrixTableContainer.style.display = "none";
-    return;
-  }
-  const symbols = obj.symbols;
-  const corr = obj.correlation;
-
-  const tbl = document.createElement("table");
-  tbl.className = "matrix";
-  const thead = document.createElement("thead");
-  const headRow = document.createElement("tr");
-  headRow.appendChild(document.createElement("th"));
-  symbols.forEach(s => {
-    const th = document.createElement("th");
-    th.textContent = s;
-    headRow.appendChild(th);
-  });
-  thead.appendChild(headRow);
-  tbl.appendChild(thead);
-
-  const tbody = document.createElement("tbody");
-  for (let i = 0; i < symbols.length; ++i) {
-    const tr = document.createElement("tr");
-    const th = document.createElement("th");
-    th.textContent = symbols[i];
-    tr.appendChild(th);
-    for (let j = 0; j < symbols.length; ++j) {
-      const td = document.createElement("td");
-      const v = corr[i] && corr[i][j];
-      td.textContent = (v === null || v === undefined) ? "-" : Number(v).toFixed(3);
-      tr.appendChild(td);
+    if (
+      !obj ||
+      !Array.isArray(obj.symbols) ||
+      !obj.correlation ||
+      !obj.covariance
+    ) {
+      matrixPlaceholder.textContent = "No matrix available";
+      matrixTableContainer.style.display = "none";
+      return;
     }
-    tbody.appendChild(tr);
-  }
-  tbl.appendChild(tbody);
-  matrixTableContainer.innerHTML = "";
-  matrixTableContainer.appendChild(tbl);
-  matrixPlaceholder.style.display = "none";
-  matrixTableContainer.style.display = "block";
+  
+    const symbols = obj.symbols;
+    const corr = obj.correlation;
+    const cov = obj.covariance;
+    console.log(cov);
+  
+    // Clear old content
+    const corrDiv = document.getElementById("correlationTable");
+    const covDiv = document.getElementById("covarianceTable");
+    corrDiv.innerHTML = "";
+    covDiv.innerHTML = "";
+  
+    // Build each table
+    corrDiv.innerHTML = `
+      <h3 style="margin-bottom:8px;">Correlation Matrix</h3>
+      ${buildMatrixTableHTML(symbols, corr)}
+    `;
+  
+    covDiv.innerHTML = `
+      <h3 style="margin-bottom:8px;">Covariance Matrix</h3>
+      ${buildMatrixTableHTML(symbols, cov)}
+    `;
+  
+    // Show results
+    matrixPlaceholder.style.display = "none";
+    matrixTableContainer.style.display = "block";
 }
+
+function buildMatrixTableHTML(symbols, matrix) {
+    let html = `<table class="matrix"><thead><tr><th></th>`;
+  
+    symbols.forEach(s => html += `<th>${s}</th>`);
+    html += `</tr></thead><tbody>`;
+  
+    for (let i = 0; i < symbols.length; i++) {
+      html += `<tr><th>${symbols[i]}</th>`;
+      for (let j = 0; j < symbols.length; j++) {
+        const val = matrix[i]?.[j];
+        html += `<td>${val == null ? "-" : Number(val).toFixed(3)}</td>`;
+      }
+      html += `</tr>`;
+    }
+  
+    html += `</tbody></table>`;
+    return html;
+}
+  
 
 // portfolio total
 async function loadPortfolioTotal(pid) {
