@@ -381,7 +381,7 @@ async function loadMatrix(pid) {
   matrixTableContainer.style.display = "none";
   matrixContainer.style.display = "block";
   try {
-    const res = await fetchJson(`/portfolio/matrix?pid=${encodeURIComponent(pid)}`);
+    const res = await fetchJson(`/stats/matrix?id=${encodeURIComponent(pid)}&usage=stockholding`);
     renderMatrix(res);
   } catch (err) {
     matrixPlaceholder.textContent = `Failed to compute matrix: ${err.message}`;
